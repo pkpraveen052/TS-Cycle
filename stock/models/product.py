@@ -142,12 +142,16 @@ class Product(models.Model):
         if dates_in_the_past:
             domain_move_in_done = list(domain_move_in)
             domain_move_out_done = list(domain_move_out)
+        use_move_inventory_report_date = self.env.context.get('use_move_inventory_report_date')
+        move_date_field = 'inventory_report_date' if use_move_inventory_report_date else 'date'
+        from_date_value = fields.Date.to_date(from_date) if use_move_inventory_report_date and from_date else from_date
+        to_date_value = fields.Date.to_date(to_date) if use_move_inventory_report_date and to_date else to_date
         if from_date:
-            date_date_expected_domain_from = [('date', '>=', from_date)]
+            date_date_expected_domain_from = [(move_date_field, '>=', from_date_value)]
             domain_move_in += date_date_expected_domain_from
             domain_move_out += date_date_expected_domain_from
         if to_date:
-            date_date_expected_domain_to = [('date', '<=', to_date)]
+            date_date_expected_domain_to = [(move_date_field, '<=', to_date_value)]
             domain_move_in += date_date_expected_domain_to
             domain_move_out += date_date_expected_domain_to
 
@@ -160,8 +164,8 @@ class Product(models.Model):
         quants_res = dict((item['product_id'][0], (item['quantity'], item['reserved_quantity'])) for item in Quant.read_group(domain_quant, ['product_id', 'quantity', 'reserved_quantity'], ['product_id'], orderby='id'))
         if dates_in_the_past:
             # Calculate the moves that were done before now to calculate back in time (as most questions will be recent ones)
-            domain_move_in_done = [('state', '=', 'done'), ('date', '>', to_date)] + domain_move_in_done
-            domain_move_out_done = [('state', '=', 'done'), ('date', '>', to_date)] + domain_move_out_done
+            domain_move_in_done = [('state', '=', 'done'), (move_date_field, '>', to_date_value)] + domain_move_in_done
+            domain_move_out_done = [('state', '=', 'done'), (move_date_field, '>', to_date_value)] + domain_move_out_done
             moves_in_res_past = dict((item['product_id'][0], item['product_qty']) for item in Move.read_group(domain_move_in_done, ['product_id', 'product_qty'], ['product_id'], orderby='id'))
             moves_out_res_past = dict((item['product_id'][0], item['product_qty']) for item in Move.read_group(domain_move_out_done, ['product_id', 'product_qty'], ['product_id'], orderby='id'))
 

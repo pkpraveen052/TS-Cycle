@@ -307,6 +307,7 @@
                                 </div>
                                 <field name="date" readonly="1" nolabel="1"/>
                                 <field name="date_deadline" force_save="1"/>
+                                <field name="inventory_report_date"/>
                             </group>
                         </group>
                         <group name="origin_grp" string="Origin" groups="base.group_no_one" >
