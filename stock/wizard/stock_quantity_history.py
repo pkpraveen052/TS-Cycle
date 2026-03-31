@@ -12,6 +12,10 @@ class StockQuantityHistory(models.TransientModel):
     inventory_datetime = fields.Datetime('Inventory at Date',
         help="Choose a date to get the inventory at that date",
         default=fields.Datetime.now)
+    use_move_inventory_report_date = fields.Boolean(
+        string='Use Stock Move Report Date',
+        help="Enable this option to compute the inventory report using the custom report date set on stock moves.",
+    )
 
     def open_at_date(self):
         tree_view_id = self.env.ref('stock.view_stock_product_tree').id
@@ -32,6 +36,10 @@ class StockQuantityHistory(models.TransientModel):
             'name': _('Products'),
             'res_model': 'product.product',
             'domain': domain,
-            'context': dict(self.env.context, to_date=self.inventory_datetime),
+            'context': dict(
+                self.env.context,
+                to_date=self.inventory_datetime,
+                use_move_inventory_report_date=self.use_move_inventory_report_date,
+            ),
         }
         return action
