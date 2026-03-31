@@ -39,6 +39,11 @@ class StockMove(models.Model):
     date = fields.Datetime(
         'Date Scheduled', default=fields.Datetime.now, index=True, required=True,
         help="Scheduled date until move is done, then date of actual move processing")
+    inventory_report_date = fields.Date(
+        string='Inventory Report Date',
+        index=True,
+        help="Custom date used by inventory history reporting when enabled from the quantity history wizard.",
+    )
     date_deadline = fields.Datetime(
         "Deadline", readonly=True,
         help="Date Promise to the customer on the top level document (SO/PO)")
